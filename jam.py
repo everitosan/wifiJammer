@@ -29,8 +29,8 @@ def stopHopper(signal, frame):
     global stop_sniff
     stop_sniff = True
     print("Sniff Stoped ...")
-    channel_hop.terminate()
-    channel_hop.join()
+    hopper.terminate()
+    hopper.join()
     print("Channel hop stopped ...")
 
 def keep_sniffing(pckt):
