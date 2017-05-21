@@ -34,6 +34,7 @@ def stopHopper(signal, frame):
     print("Channel hop stopped ...")
 
 def keep_sniffing(pckt):
+    global stop_sniff
     return stop_sniff
 
 def add_network(pckt, known_networks):
