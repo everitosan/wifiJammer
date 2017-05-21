@@ -2,6 +2,7 @@ import argparse
 from multiprocessing import Process
 import signal
 import random
+from scapy.all  import *
 
 def setArgs():
     parser = argparse.ArgumentParser()
@@ -32,6 +33,12 @@ def stopHopper(signal, frame):
     #channel_hop.join()
     print("Channel hop stopped ...")
 
+def keep_sniffing(pckt):
+    return stop_sniff
+
+def add_network(pckt, known_networks):
+    essid = pckt[Dot11Elt].info if 'x00'
+
 if __name__ == "__main__":
     parser = setArgs()
     networks = {}
@@ -41,5 +48,4 @@ if __name__ == "__main__":
     hopper = Process(target= channel_hop, args=(parser.interface,) )
     #hopper.start()
     signal.signal(signal.SIGINT, stopHopper)
-    while not stop_sniff:
-        channel = random.randrange(1,13)
+    sniff(lfilter = lambda x: (x.haslayer(Dot11Beacon) or x.haslayer(Dot11ProbeResp)), stop_filter= keep_sniffing, prn = lambda x: add_network(x.networks) )
