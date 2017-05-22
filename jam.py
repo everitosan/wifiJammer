@@ -3,6 +3,9 @@ from multiprocessing import Process
 import signal
 import random
 from scapy.all  import *
+import logging
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
+
 
 def setArgs():
     parser = argparse.ArgumentParser()
@@ -17,11 +20,16 @@ def setArgs():
     return parser.parse_args()
 
 def channel_hop(interface):
+    counterChannel = 1
     while True:
         try:
             channel = random.randrange(1,13)
-            os.system("iwconfig %s channel %d" % (interface, channel))
-            time.sleep(1)
+            os.system("iwconfig %s channel %d" % (interface, counterChannel))
+            time.sleep(3)
+            if counterChannel <= 12:
+                counterChannel+=1
+            else :
+                counterChannel = 1
         except KeyboardInterrupt:
             break
 
@@ -39,19 +47,24 @@ def keep_sniffing(pckt):
 
 def add_network(pckt, known_networks):
     essid = pckt[Dot11Elt].info if '\x00' not in pckt[Dot11Elt].info  and pckt[Dot11Elt].info != '' else 'Hidden SSID'
-    bssid = pckt[Dot11Elt].addr3
+    bssid = pckt[Dot11].addr3
     channel = int(ord(pckt[Dot11Elt:3].info))
     if bssid not in known_networks:
         known_networks[bssid] = (essid, channel)
         print "{0:5}\t{1:30}\t{2:30}".format(channel, essid, bssid)
 
 if __name__ == "__main__":
-    parser = setArgs()
+    args = setArgs()
     networks = {}
+    global stop_sniff
     stop_sniff = False
     print("Press CTRL+C to stop sniffing...")
     print("="*100 + '\n{0:5}\t{1:30}\t{2:30}\n'.format('Channel', 'ESSID','BSSID') + '='*100)
-    hopper = Process(target= channel_hop, args=(parser.interface,) )
+    hopper = Process(target= channel_hop, args=(args.interface,) )
     hopper.start()
     signal.signal(signal.SIGINT, stopHopper)
-    sniff(lfilter = lambda x: (x.haslayer(Dot11Beacon) or x.haslayer(Dot11ProbeResp)), stop_filter= keep_sniffing, prn = lambda x: add_network(x.networks) )
+    sniff(
+        iface = args.interface,
+        lfilter = lambda x: (x.haslayer(Dot11Beacon) or x.haslayer(Dot11ProbeResp)), 
+        stop_filter= keep_sniffing, 
+        prn = lambda x: add_network(x, networks) )
