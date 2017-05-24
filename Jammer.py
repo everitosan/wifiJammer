@@ -56,7 +56,7 @@ class Jammer:
 
         if count == -1:
             print("Press CTRL+C to quit")
-            while not ATTACK_STOP:
+            while not self.ATTACK_STOP:
                 sendp(pckt, iface=self.INTERFACE, inter = .1, count=1)
         else:
             sendp(pckt, iface=self.INTERFACE, inter = .1, count=count)
