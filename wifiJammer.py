@@ -2,7 +2,7 @@ import argparse
 from multiprocessing import Process
 import signal
 import logging
-import Jammer
+import . import Jammer
 
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 
