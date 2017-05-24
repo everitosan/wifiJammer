@@ -37,6 +37,7 @@ def stopHopper(m_signal, frame):
 def main():
     global HOPER
     global ATTACKER
+    global JAMMER
     ARGS = setArgs()
 
     JAMMER = Jammer(ARGS.interface)
