@@ -44,7 +44,7 @@ def main():
     print("Press CTRL+C to stop sniffing...")
     print("="*100 + '\n{0:5}\t{1:30}\t{2:30}\n'.format('Channel', 'ESSID','BSSID') + '='*100)
 
-    HOPER = get_channel_hop_process()
+    HOPER = JAMMER.get_channel_hop_process()
     HOPER.start()
 
     JAMMER.sniff()
