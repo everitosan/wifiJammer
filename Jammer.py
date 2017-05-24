@@ -73,7 +73,7 @@ class Jammer:
             deauth_pckt_count = -1
         else:
             deauth_pckt_count = int(deauth_pckt_count)
-        return Process(target = perform_deauth, args=(target_accesspoint, 'FF:FF:FF:FF:FF:FF', deauth_pckt_count))
+        return Process(target = self.perform_deauth, args=(target_accesspoint, 'FF:FF:FF:FF:FF:FF', deauth_pckt_count))
 
     def stop_attack(self):
         self.ATTACK_STOP = True
