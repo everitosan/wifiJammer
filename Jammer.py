@@ -4,14 +4,14 @@ import sys
 
 class Jammer:
     def __init__(self, interface):
-        INTERFACE = interface # Var to store the selected interface
-        STOP_SNIFF = False #Sniffing flag
-        NETWORKS = {} #Dictionary to store available accesspoints
-        ATTACK_STOP = False #Attacking flag
+        self.INTERFACE = interface # Var to store the selected interface
+        self.STOP_SNIFF = False #Sniffing flag
+        self.NETWORKS = {} #Dictionary to store available accesspoints
+        self.ATTACK_STOP = False #Attacking flag
 
     def start_channel_hop(self):
         counterChannel = 1
-        while not STOP_SNIFF:
+        while not self.STOP_SNIFF:
             try:
                 channel = random.randrange(1,13)
                 os.system("iwconfig %s channel %d" % (self.INTERFACE, counterChannel))
