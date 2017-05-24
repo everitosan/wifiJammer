@@ -1,6 +1,7 @@
 from scapy.all  import *
 import random
 import sys
+from multiprocessing import Process
 
 class Jammer:
     def __init__(self, interface):
@@ -8,6 +9,9 @@ class Jammer:
         self.STOP_SNIFF = False #Sniffing flag
         self.NETWORKS = {} #Dictionary to store available accesspoints
         self.ATTACK_STOP = False #Attacking flag
+
+    def get_channel_hop_process(self):
+        return Process(target= self.start_channel_hop)
 
     def start_channel_hop(self):
         counterChannel = 1
