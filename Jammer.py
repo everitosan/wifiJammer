@@ -29,6 +29,13 @@ class Jammer:
     def get_channel_hop_status(self):
         return self.STOP_SNIFF
 
+    def sniff(self):
+        sniff(
+            iface = self.INTERFACE,
+            lfilter = lambda x: (x.haslayer(Dot11Beacon) or x.haslayer(Dot11ProbeResp)),
+            stop_filter= lambda x: (self.STOP_SNIFF ),
+            prn = lambda x: self.add_network(x) )
+
     # Method capable of finding and adding new networks to NETWORKS list
     def add_network(self, pckt):
         essid = pckt[Dot11Elt].info if '\x00' not in pckt[Dot11Elt].info  and pckt[Dot11Elt].info != '' else 'Hidden SSID'

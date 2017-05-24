@@ -47,11 +47,7 @@ def main():
     HOPER = Process(target= JAMMER.start_channel_hop)
     HOPER.start()
 
-    sniff(
-        iface = ARGS.interface,
-        lfilter = lambda x: (x.haslayer(Dot11Beacon) or x.haslayer(Dot11ProbeResp)),
-        stop_filter= lambda x: (JAMMER.get_channel_hop_status() ),
-        prn = lambda x: JAMMER.add_network(x) )
+    JAMMER.sniff()
 
     signal.signal(signal.SIGINT, stopHopper)
 
