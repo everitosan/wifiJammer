@@ -42,7 +42,7 @@ def main():
 
     JAMMER = Jammer(ARGS.interface)
 
-    if not allAccesspoints:
+    if not ARGS.allAccesspoints:
         print("Press CTRL+C to stop sniffing...")
         print("="*100 + '\n{0:5}\t{1:30}\t{2:30}\n'.format('Channel', 'ESSID','BSSID') + '='*100)
 
