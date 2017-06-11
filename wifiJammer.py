@@ -3,11 +3,12 @@ import signal
 import logging
 from Jammer import Jammer
 from multiprocessing import Process
+import time
 
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 
 HOPER = None #Var to store process that changes the channel
-ATACKER = None #Var to store process that sends the packages
+ATTACKER = None #Var to store process that sends the packages
 JAMMER = None #Var to store Jammer instance
 
 def setArgs():
@@ -67,9 +68,9 @@ def main():
         Sniffer.start()
 
         # While the proccess doesn't finish it will be in the cycle
-        while not JAMMER.get_stop_sniff():
-            print "."
-
+        print("Scaning ...")
+        time.sleep(36)
+        print("Starting massive attack ...")
         #Once the process finishes and we have saved all the AP terminate the process and start the massive attack
         Hoper.terminate()
         Hoper.join()
